@@ -55,7 +55,6 @@ use Twig\Environment;
  */
 #[Route(path: '/invoice')]
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
-#[IsGranted('view_invoice')]
 final class InvoiceController extends AbstractController
 {
     public function __construct(
@@ -205,7 +204,12 @@ final class InvoiceController extends AbstractController
 
                 $this->flashSuccess('action.update.success');
 
-                return $this->redirectToRoute('admin_invoice_list', ['id' => $invoice->getId()]);
+                if ($this->isGranted('view_invoice')) {
+                    return $this->redirectToRoute('admin_invoice_list', ['id' => $invoice->getId()]);
+                } else {
+                    $file = $service->getInvoiceFile($invoice);
+                    return $this->file($file->getRealPath(), $file->getBasename());
+                }
             } catch (Exception $ex) {
                 $this->flashUpdateException($ex);
             }
