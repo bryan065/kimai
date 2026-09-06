@@ -55,7 +55,6 @@ use Twig\Environment;
  */
 #[Route(path: '/invoice')]
 #[IsGranted('IS_AUTHENTICATED_FULLY')]
-#[IsGranted('view_invoice')]
 final class InvoiceController extends AbstractController
 {
     public function __construct(
@@ -205,7 +204,12 @@ final class InvoiceController extends AbstractController
 
                 $this->flashSuccess('action.update.success');
 
-                return $this->redirectToRoute('admin_invoice_list', ['id' => $invoice->getId()]);
+                if ($this->isGranted('view_invoice')) {
+                    return $this->redirectToRoute('admin_invoice_list', ['id' => $invoice->getId()]);
+                } else {
+                    $file = $service->getInvoiceFile($invoice);
+                    return $this->file($file->getRealPath(), $file->getBasename());
+                }
             } catch (Exception $ex) {
                 $this->flashUpdateException($ex);
             }
@@ -221,7 +225,7 @@ final class InvoiceController extends AbstractController
      * saved by the form (see admin_invoice_edit) and not by this route.
      */
     #[Route(path: '/mark-paid/{id}', name: 'admin_invoice_paid', methods: ['GET'])]
-    #[IsGranted('edit_invoice', 'invoice')]
+    #[IsGranted('edit_invoice')]
     public function markPaidAction(Invoice $invoice, InvoiceService $invoiceService): Response
     {
         if (null === $invoice->getPaymentDate()) {
@@ -239,7 +243,7 @@ final class InvoiceController extends AbstractController
     }
 
     #[Route(path: '/change-status/{id}/{status}', name: 'admin_invoice_status', methods: ['POST'])]
-    #[IsGranted('edit_invoice', 'invoice')]
+    #[IsGranted('edit_invoice')]
     public function changeStatusAction(Invoice $invoice, string $status, Request $request, CsrfTokenManagerInterface $csrfTokenManager, InvoiceService $InvoiceService): Response
     {
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('invoice.status', $this->getRequestToken($request)))) {
@@ -259,7 +263,7 @@ final class InvoiceController extends AbstractController
     }
 
     #[Route(path: '/edit/{id}', name: 'admin_invoice_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('edit_invoice', 'invoice')]
+    #[IsGranted('edit_invoice')]
     public function editAction(Invoice $invoice, Request $request, InvoiceService $InvoiceService): Response
     {
         $form = $this->createInvoiceEditForm($invoice, $InvoiceService);
@@ -314,6 +318,11 @@ final class InvoiceController extends AbstractController
         $query = new InvoiceArchiveQuery();
         $query->setPage($page);
         $query->setCurrentUser($this->getUser());
+
+        if (!$this->isGranted('view_other_invoice')) {
+            // limit access to own invoices
+            $query->addUser($this->getUser());
+        }
 
         $form = $this->getArchiveToolbarForm($query);
         if ($this->handleSearch($form, $request)) {

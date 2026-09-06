@@ -29,6 +29,7 @@ final class InvoiceVoter extends Voter
         'view_invoice',
         'edit_invoice',
         'delete_invoice',
+        'view_other_invoice',
     ];
 
     public function __construct(private readonly RolePermissionManager $rolePermissionManager)
@@ -89,6 +90,10 @@ final class InvoiceVoter extends Voter
 
         if ($attribute === 'delete_invoice') {
             return $this->rolePermissionManager->hasRolePermission($user, 'delete_invoice');
+        }
+
+        if ($attribute === 'view_other_invoice') {
+            return $this->rolePermissionManager->hasRolePermission($user, 'view_other_invoice');
         }
 
         return false;

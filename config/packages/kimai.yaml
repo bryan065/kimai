@@ -90,7 +90,7 @@ kimai:
             CUSTOMERS_ALL_TEAM: ['view_team_customer','edit_team_customer','budget_team_customer','time_team_customer','comments_team_customer','details_team_customer']
             CUSTOMERS_TEAMLEAD: ['view_teamlead_customer','budget_teamlead_customer','time_teamlead_customer','comments_teamlead_customer','details_teamlead_customer']
             INVOICE: ['view_invoice','create_invoice']
-            INVOICE_ADMIN: ['manage_invoice_template']
+            INVOICE_ADMIN: ['manage_invoice_template','view_other_invoice', 'edit_invoice']
             INVOICE_ALL: ['delete_invoice']
             TIMESHEET: ['view_own_timesheet','start_own_timesheet','stop_own_timesheet','create_own_timesheet','edit_own_timesheet','export_own_timesheet','delete_own_timesheet','weekly_own_timesheet']
             TIMESHEET_OTHER: ['view_other_timesheet','start_other_timesheet','stop_other_timesheet','create_other_timesheet','edit_other_timesheet','export_other_timesheet','delete_other_timesheet']

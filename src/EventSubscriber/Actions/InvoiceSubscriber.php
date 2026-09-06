@@ -48,8 +48,9 @@ final class InvoiceSubscriber extends AbstractActionsSubscriber
 
         $allowCreate = $this->isGranted('create_invoice');
         $allowView = $this->isGranted('view_invoice');
+        $allowEdit = $this->isGranted('edit_invoice');
 
-        if ($allowCreate) {
+        if ($allowEdit) {
             $event->addEdit($this->path('admin_invoice_edit', ['id' => $invoice->getId()]));
         }
 
@@ -61,7 +62,7 @@ final class InvoiceSubscriber extends AbstractActionsSubscriber
             $event->addDivider();
         }
 
-        if ($allowCreate) {
+        if ($allowEdit) {
             if (!$invoice->isPending()) {
                 $event->addAction('invoice.pending', $this->createStatusAction($invoice, 'pending'));
             } else {
